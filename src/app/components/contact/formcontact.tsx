@@ -14,7 +14,6 @@ import Button from '../ui/button';
 import { useSelector } from 'react-redux';
 
 export const Contact = () => {
-
   const form: any = useRef();
   const { title } = useSelector(
     (rootReducer: any) => rootReducer.servicesReducer
@@ -62,7 +61,7 @@ export const Contact = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    if (name === '' || email === '' || message === '' && form) {
+    if (name === '' || email === '' || (message === '' && form)) {
       return alert('Por favor, preencha todos os campos do formulário.');
     } else {
       sendEmail(e);
@@ -79,24 +78,23 @@ export const Contact = () => {
 
     emailjs
       .sendForm(
-        "service_4t6bv2j",
-        "template_8jc32ye",
+        'service_4t6bv2j',
+        'template_8jc32ye',
         form.current,
-        "RCq0RHnaSdjRp5ISW"
+        'RCq0RHnaSdjRp5ISW'
       )
       .then(
         () => {
           window.alert(
-            'Mensagem enviada com sucesso! ✅ Aguarde a devolutiva, ou nos contate via whatsapp (81)9 9162-0892.'
+            `Mensagem enviada com sucesso! ✅ Aguarde a devolutiva, ou nos contate via whatsapp ${process.env.NEXT_PUBLIC_CELLPHONE_NUMBER}`
           );
         },
         () => {
           window.alert(
-            'Erro ao enviar sua mensagem. ❌ Por favor tente novamente ou nos contate via whatsapp (41) 98786-6558.'
+            `Erro ao enviar sua mensagem. ❌ Por favor tente novamente ou nos contate via whatsapp ${process.env.NEXT_PUBLIC_CELLPHONE_NUMBER}`
           );
         }
       );
-
   };
 
   return (
@@ -199,7 +197,8 @@ const Form = styled.form`
     margin-top: 0px;
   }
 
-  label, input {
+  label,
+  input {
     font-family: 'DM Sans', sans-serif !important;
     font-size: 18px;
     color: ${colors.black};
@@ -212,7 +211,6 @@ const Form = styled.form`
 
   input[name='message'] {
     height: 3.4375em !important;
-
   }
   button {
     background-color: ${colors.yellow};
