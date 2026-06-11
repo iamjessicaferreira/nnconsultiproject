@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* offset for the fixed navbar when jumping to anchors */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-white text-brand-ink font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-yellow text-brand-ink;
+  }
+}
+
+@layer utilities {
+  .section-x {
+    @apply mx-auto w-full max-w-content px-5 sm:px-8;
+  }
+
+  /* pause the partner marquee on hover */
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee {
+    animation: none;
+  }
+}
