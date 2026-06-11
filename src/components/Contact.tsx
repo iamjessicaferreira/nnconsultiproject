@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import emailjs from 'emailjs-com';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { Mail, MessageCircle, Phone, Send } from 'lucide-react';
 import { SectionTitle } from './ui/SectionTitle';
 import { Reveal } from './ui/Reveal';
+import { Modal, type ModalVariant } from './ui/Modal';
 import { site } from '@/lib/site';
 
 const EMAILJS = {
@@ -13,6 +15,9 @@ const EMAILJS = {
   publicKey: 'RCq0RHnaSdjRp5ISW',
 };
 
+// reCAPTCHA only renders/enforces when a site key is configured.
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
 const messageFor = (service: string | null) =>
   `Olá, gostaria de mais informações sobre ${service ?? 'seus serviços'}.`;
 
@@ -20,9 +25,26 @@ type Props = {
   selectedService: string | null;
 };
 
+type ModalState = {
+  open: boolean;
+  title: string;
+  message: string;
+  variant: ModalVariant;
+};
+
+const CLOSED_MODAL: ModalState = {
+  open: false,
+  title: '',
+  message: '',
+  variant: 'info',
+};
+
 export function Contact({ selectedService }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [status, setStatus] = useState<'idle' | 'sending'>('idle');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [modal, setModal] = useState<ModalState>(CLOSED_MODAL);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -34,6 +56,14 @@ export function Contact({ selectedService }: Props) {
     setForm((prev) => ({ ...prev, message: messageFor(selectedService) }));
   }, [selectedService]);
 
+  const openModal = (
+    variant: ModalVariant,
+    title: string,
+    message: string,
+  ) => setModal({ open: true, variant, title, message });
+
+  const closeModal = () => setModal((m) => ({ ...m, open: false }));
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -42,11 +72,31 @@ export function Contact({ selectedService }: Props) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!formRef.current) return;
+
+    // Honeypot: a hidden field humans never see. If it's filled, it's a bot.
+    const honeypot = formRef.current.elements.namedItem(
+      'company_website',
+    ) as HTMLInputElement | null;
+    if (honeypot?.value) return;
+
     if (!form.name || !form.email || !form.message) {
-      alert('Por favor, preencha todos os campos do formulário.');
+      openModal(
+        'error',
+        'Campos incompletos',
+        'Por favor, preencha todos os campos do formulário.',
+      );
       return;
     }
-    if (!formRef.current) return;
+
+    if (RECAPTCHA_SITE_KEY && !captchaToken) {
+      openModal(
+        'error',
+        'Confirmação necessária',
+        'Confirme que você não é um robô antes de enviar.',
+      );
+      return;
+    }
 
     setStatus('sending');
     try {
@@ -56,13 +106,19 @@ export function Contact({ selectedService }: Props) {
         formRef.current,
         EMAILJS.publicKey,
       );
-      alert(
-        `Mensagem enviada com sucesso! ✅ Aguarde a devolutiva, ou nos contate via WhatsApp ${site.phone}`,
+      openModal(
+        'success',
+        'Mensagem enviada!',
+        `Recebemos o seu contato e retornaremos em breve. Se preferir, fale conosco no WhatsApp ${site.phone}.`,
       );
       setForm({ name: '', email: '', message: messageFor(null) });
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     } catch {
-      alert(
-        `Erro ao enviar sua mensagem. ❌ Por favor tente novamente ou nos contate via WhatsApp ${site.phone}`,
+      openModal(
+        'error',
+        'Não foi possível enviar',
+        `Tente novamente em instantes ou fale conosco no WhatsApp ${site.phone}.`,
       );
     } finally {
       setStatus('idle');
@@ -185,6 +241,25 @@ export function Contact({ selectedService }: Props) {
               />
             </div>
 
+            {/* Honeypot — hidden from users, bots tend to fill it */}
+            <input
+              type="text"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
+
+            {RECAPTCHA_SITE_KEY && (
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={RECAPTCHA_SITE_KEY}
+                onChange={setCaptchaToken}
+                onExpired={() => setCaptchaToken(null)}
+              />
+            )}
+
             <button
               type="submit"
               disabled={status === 'sending'}
@@ -196,6 +271,14 @@ export function Contact({ selectedService }: Props) {
           </form>
         </Reveal>
       </div>
+
+      <Modal
+        open={modal.open}
+        onClose={closeModal}
+        variant={modal.variant}
+        title={modal.title}
+        message={modal.message}
+      />
     </section>
   );
 }
