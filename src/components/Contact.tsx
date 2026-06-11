@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import emailjs from 'emailjs-com';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Mail, MessageCircle, Phone, Send } from 'lucide-react';
+import { Mail, Phone, Send } from 'lucide-react';
+import { RiWhatsappFill } from 'react-icons/ri';
 import { SectionTitle } from './ui/SectionTitle';
 import { Reveal } from './ui/Reveal';
 import { Modal, type ModalVariant } from './ui/Modal';
@@ -144,48 +145,42 @@ export function Contact({ selectedService }: Props) {
               rápido possível.
             </p>
           </div>
-          <ul className="flex flex-col gap-5">
-            <li>
-              <a
-                href={site.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-4"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-ink/10 text-brand-ink transition-colors group-hover:bg-brand-gold group-hover:text-brand-ink">
-                  <MessageCircle size={20} />
+          <div className="flex flex-col gap-5">
+            <ul className="flex flex-col gap-5">
+              <li className="flex items-center gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-ink/10 text-brand-ink">
+                  <Mail size={20} />
                 </span>
                 <span>
                   <span className="block text-xs uppercase tracking-wide text-brand-ink/50">
-                    WhatsApp
+                    E-mail
+                  </span>
+                  <span className="text-sm font-medium">{site.email}</span>
+                </span>
+              </li>
+              <li className="flex items-center gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-ink/10 text-brand-ink">
+                  <Phone size={20} />
+                </span>
+                <span>
+                  <span className="block text-xs uppercase tracking-wide text-brand-ink/50">
+                    Telefone
                   </span>
                   <span className="text-sm font-medium">{site.phone}</span>
                 </span>
-              </a>
-            </li>
-            <li className="flex items-center gap-4">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-ink/10 text-brand-ink">
-                <Mail size={20} />
-              </span>
-              <span>
-                <span className="block text-xs uppercase tracking-wide text-brand-ink/50">
-                  E-mail
-                </span>
-                <span className="text-sm font-medium">{site.email}</span>
-              </span>
-            </li>
-            <li className="flex items-center gap-4">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-ink/10 text-brand-ink">
-                <Phone size={20} />
-              </span>
-              <span>
-                <span className="block text-xs uppercase tracking-wide text-brand-ink/50">
-                  Telefone
-                </span>
-                <span className="text-sm font-medium">{site.phone}</span>
-              </span>
-            </li>
-          </ul>
+              </li>
+            </ul>
+
+            <a
+              href={site.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-brand-ink shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <RiWhatsappFill size={20} className="text-whatsapp" />
+              Falar no WhatsApp
+            </a>
+          </div>
         </Reveal>
 
         {/* Form */}
