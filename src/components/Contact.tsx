@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import emailjs from 'emailjs-com';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Mail, Phone, Send } from 'lucide-react';
@@ -57,16 +58,13 @@ export function Contact({ selectedService }: Props) {
     setForm((prev) => ({ ...prev, message: messageFor(selectedService) }));
   }, [selectedService]);
 
-  const openModal = (
-    variant: ModalVariant,
-    title: string,
-    message: string,
-  ) => setModal({ open: true, variant, title, message });
+  const openModal = (variant: ModalVariant, title: string, message: string) =>
+    setModal({ open: true, variant, title, message });
 
   const closeModal = () => setModal((m) => ({ ...m, open: false }));
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -77,7 +75,7 @@ export function Contact({ selectedService }: Props) {
 
     // Honeypot: a hidden field humans never see. If it's filled, it's a bot.
     const honeypot = formRef.current.elements.namedItem(
-      'company_website',
+      'company_website'
     ) as HTMLInputElement | null;
     if (honeypot?.value) return;
 
@@ -85,7 +83,7 @@ export function Contact({ selectedService }: Props) {
       openModal(
         'error',
         'Campos incompletos',
-        'Por favor, preencha todos os campos do formulário.',
+        'Por favor, preencha todos os campos do formulário.'
       );
       return;
     }
@@ -94,7 +92,7 @@ export function Contact({ selectedService }: Props) {
       openModal(
         'error',
         'Confirmação necessária',
-        'Confirme que você não é um robô antes de enviar.',
+        'Confirme que você não é um robô antes de enviar.'
       );
       return;
     }
@@ -105,12 +103,12 @@ export function Contact({ selectedService }: Props) {
         EMAILJS.serviceId,
         EMAILJS.templateId,
         formRef.current,
-        EMAILJS.publicKey,
+        EMAILJS.publicKey
       );
       openModal(
         'success',
         'Mensagem enviada!',
-        `Recebemos o seu contato e retornaremos em breve. Se preferir, fale conosco no WhatsApp ${site.phone}.`,
+        `Recebemos o seu contato e retornaremos em breve. Se preferir, fale conosco no WhatsApp ${site.phone}.`
       );
       setForm({ name: '', email: '', message: messageFor(null) });
       recaptchaRef.current?.reset();
@@ -119,7 +117,7 @@ export function Contact({ selectedService }: Props) {
       openModal(
         'error',
         'Não foi possível enviar',
-        `Tente novamente em instantes ou fale conosco no WhatsApp ${site.phone}.`,
+        `Tente novamente em instantes ou fale conosco no WhatsApp ${site.phone}.`
       );
     } finally {
       setStatus('idle');
@@ -130,54 +128,62 @@ export function Contact({ selectedService }: Props) {
     'w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-brand-ink outline-none transition-all duration-200 placeholder:text-neutral-400 focus:border-brand-gold focus:bg-white focus:ring-2 focus:ring-brand-gold/30';
 
   return (
-    <section id="form" className="section-x scroll-mt-24 py-20 sm:py-28">
-      <SectionTitle eyebrow="Contato" title="Entre em contato" />
+    <section id='form' className='section-x scroll-mt-24 py-20 sm:py-28'>
+      <SectionTitle eyebrow='Contato' title='Entre em contato' />
 
-      <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_1.1fr]">
+      <div className='mt-14 grid gap-10 lg:grid-cols-[1fr_1.1fr]'>
         {/* Info panel — replaces the original 2.6 MB illustration */}
-        <Reveal className="flex flex-col justify-between gap-6 rounded-3xl bg-brand-yellow p-8 text-brand-ink sm:p-10">
-          <div>
-            <h3 className="font-serif text-2xl sm:text-3xl">
-              Vamos conversar sobre o seu projeto
-            </h3>
-            <p className="mt-3 text-brand-ink/70">
+        <Reveal className='flex h-full flex-col gap-6 overflow-hidden rounded-3xl bg-brand-yellow p-8 text-brand-ink sm:p-10'>
+          <h3 className='w-full font-serif text-2xl sm:text-3xl'>
+            Vamos conversar sobre o seu projeto
+          </h3>
+
+          {/* texto (20%) + imagem (80%) — preenche o espaço p/ casar a altura do formulário */}
+          <div className='grid min-h-0 flex-1 grid-cols-1 items-stretch gap-6 sm:grid-cols-[1fr_4fr]'>
+            <p className='self-center text-brand-ink/70'>
               Conte para a nossa equipe o que você precisa. Respondemos o mais
               rápido possível.
             </p>
+            <div className='relative h-full min-h-[200px] w-full'>
+              <Image
+                src='/contato.webp'
+                fill
+                sizes='(max-width: 1024px) 60vw, 30vw'
+                alt='Atendente da NN Consulti ao telefone'
+                className='object-contain object-center'
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-5">
-            <ul className="flex flex-col gap-5">
-              <li className="flex items-center gap-4">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-ink/10 text-brand-ink">
-                  <Mail size={20} />
+
+          {/* contatos — abaixo de tudo, 100% de largura, ícones sem fundo */}
+          <div className='flex w-full flex-col gap-5'>
+            <div className='flex w-full items-center gap-3'>
+              <Mail size={24} className='shrink-0 text-brand-ink' />
+              <span>
+                <span className='block text-xs uppercase tracking-wide text-brand-ink/50'>
+                  E-mail
                 </span>
-                <span>
-                  <span className="block text-xs uppercase tracking-wide text-brand-ink/50">
-                    E-mail
-                  </span>
-                  <span className="text-sm font-medium">{site.email}</span>
+                <span className='text-sm font-medium'>{site.email}</span>
+              </span>
+            </div>
+
+            <div className='flex w-full items-center gap-3'>
+              <Phone size={24} className='shrink-0 text-brand-ink' />
+              <span>
+                <span className='block text-xs uppercase tracking-wide text-brand-ink/50'>
+                  Telefone
                 </span>
-              </li>
-              <li className="flex items-center gap-4">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-ink/10 text-brand-ink">
-                  <Phone size={20} />
-                </span>
-                <span>
-                  <span className="block text-xs uppercase tracking-wide text-brand-ink/50">
-                    Telefone
-                  </span>
-                  <span className="text-sm font-medium">{site.phone}</span>
-                </span>
-              </li>
-            </ul>
+                <span className='text-sm font-medium'>{site.phone}</span>
+              </span>
+            </div>
 
             <a
               href={site.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-brand-ink shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+              target='_blank'
+              rel='noopener noreferrer'
+              className='flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-brand-ink shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md'
             >
-              <RiWhatsappFill size={20} className="text-whatsapp" />
+              <RiWhatsappFill size={20} className='text-whatsapp' />
               Falar no WhatsApp
             </a>
           </div>
@@ -188,47 +194,56 @@ export function Contact({ selectedService }: Props) {
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="flex flex-col gap-5 rounded-3xl border border-neutral-100 bg-white p-8 shadow-[0_2px_12px_rgba(0,0,0,0.05)] sm:p-10"
+            className='flex flex-col gap-5 rounded-3xl border border-neutral-100 bg-white p-8 shadow-[0_2px_12px_rgba(0,0,0,0.05)] sm:p-10'
           >
-            <div className="flex flex-col gap-2">
-              <label htmlFor="name" className="text-sm font-medium text-brand-ink">
+            <div className='flex flex-col gap-2'>
+              <label
+                htmlFor='name'
+                className='text-sm font-medium text-brand-ink'
+              >
                 Nome da empresa
               </label>
               <input
-                id="name"
-                name="name"
+                id='name'
+                name='name'
                 value={form.name}
                 onChange={handleChange}
-                placeholder="NN Consulti"
+                placeholder='NN Consulti'
                 className={inputClass}
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-sm font-medium text-brand-ink">
+            <div className='flex flex-col gap-2'>
+              <label
+                htmlFor='email'
+                className='text-sm font-medium text-brand-ink'
+              >
                 E-mail
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id='email'
+                name='email'
+                type='email'
                 value={form.email}
                 onChange={handleChange}
-                placeholder="contato@suaempresa.com.br"
+                placeholder='contato@suaempresa.com.br'
                 className={inputClass}
               />
-              <span className="text-xs text-neutral-400">
+              <span className='text-xs text-neutral-400'>
                 Não iremos compartilhar seu e-mail.
               </span>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="message" className="text-sm font-medium text-brand-ink">
+            <div className='flex flex-col gap-2'>
+              <label
+                htmlFor='message'
+                className='text-sm font-medium text-brand-ink'
+              >
                 Como podemos te ajudar?
               </label>
               <textarea
-                id="message"
-                name="message"
+                id='message'
+                name='message'
                 rows={4}
                 value={form.message}
                 onChange={handleChange}
@@ -238,12 +253,12 @@ export function Contact({ selectedService }: Props) {
 
             {/* Honeypot — hidden from users, bots tend to fill it */}
             <input
-              type="text"
-              name="company_website"
+              type='text'
+              name='company_website'
               tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              className="absolute -left-[9999px] h-0 w-0 opacity-0"
+              autoComplete='off'
+              aria-hidden='true'
+              className='absolute -left-[9999px] h-0 w-0 opacity-0'
             />
 
             {RECAPTCHA_SITE_KEY && (
@@ -256,9 +271,9 @@ export function Contact({ selectedService }: Props) {
             )}
 
             <button
-              type="submit"
+              type='submit'
               disabled={status === 'sending'}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-brand-yellow px-7 py-3 text-sm font-semibold text-brand-ink transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-gold hover:text-brand-ink disabled:cursor-not-allowed disabled:opacity-60"
+              className='mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-brand-yellow px-7 py-3 text-sm font-semibold text-brand-ink transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-gold hover:text-brand-ink disabled:cursor-not-allowed disabled:opacity-60'
             >
               {status === 'sending' ? 'Enviando...' : 'Enviar mensagem'}
               <Send size={16} />
