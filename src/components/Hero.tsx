@@ -30,15 +30,7 @@ export function Hero() {
         sizes="100vw"
         className="object-cover object-[70%_20%]"
       />
-      {/* legibility scrim: darker on the left, fades toward the subject */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-brand-ink via-brand-ink/85 to-brand-ink/20"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-gradient-to-t from-brand-ink/80 via-transparent to-transparent"
-      />
+      {/* overlay removido a pedido da cliente — legibilidade via text-shadow no texto */}
 
       <div className="section-x relative z-10 pt-24">
         <div className="max-w-3xl">
@@ -57,7 +49,7 @@ export function Hero() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="mt-6 font-serif text-5xl leading-[1.05] text-white sm:text-6xl lg:text-7xl"
+            className="mt-6 font-serif text-5xl leading-[1.05] text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.55)] sm:text-6xl lg:text-7xl"
           >
             NN Consulti
           </motion.h1>
@@ -67,7 +59,7 @@ export function Hero() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl"
+            className="mt-6 max-w-xl text-lg leading-relaxed text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.6)] sm:text-xl"
           >
             Tecnologia e inovação? A NN Consulti tem a solução. Venha já tomar um
             café com os nossos especialistas!
