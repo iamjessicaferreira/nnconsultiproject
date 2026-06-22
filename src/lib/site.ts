@@ -28,7 +28,7 @@ const whatsappBase =
 
 export const site = {
   name: 'NN Consulti',
-  url: 'https://nnconsulti.com.br',
+  url: 'https://www.nnconsulti.com.br',
   phone: '(41) 98786-6558',
   whatsapp: whatsappBase,
   linkedin: 'https://www.linkedin.com/company/nn-consulti/',
