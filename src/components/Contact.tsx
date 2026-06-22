@@ -111,8 +111,6 @@ export function Contact({ selectedService }: Props) {
         `Recebemos o seu contato e retornaremos em breve. Se preferir, fale conosco no WhatsApp ${site.phone}.`
       );
       setForm({ name: '', email: '', message: messageFor(null) });
-      recaptchaRef.current?.reset();
-      setCaptchaToken(null);
     } catch {
       openModal(
         'error',
@@ -121,6 +119,10 @@ export function Contact({ selectedService }: Props) {
       );
     } finally {
       setStatus('idle');
+      // reCAPTCHA tokens are single-use and expire (~2 min). Reset after every
+      // attempt so a stale token is never reused ("timeout-or-duplicate").
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     }
   };
 
